@@ -1,11 +1,10 @@
-/Vanessa_Allodoli_OOP/claro/plot/*.png
-/Vanessa_Allodoli_OOP/claro/plot/*.jpg
-/Vanessa_Allodoli_OOP/claro/plot/*.pdf
-/Vanessa_Allodoli_OOP/sipm/plot/*.png
-/Vanessa_Allodoli_OOP/sipm/plot/*.jpg
-/Vanessa_Allodoli_OOP/sipm/plot/*.pdf
+*png
+*jpg
+*pdf
+*txt
 __pycache__
 .idea
 .vscode
 source
 /Vanessa_Allodoli_OOP/secondolotto_1
+/Vanessa_Allodoli_OOP/source

@@ -1,0 +1,12 @@
+{
+    "n_points_baseline": 500,
+    "peak_height": 0.001,
+    "peak_prominence": 0.0001,
+    "group_name": "gruppo_r",
+    "folder_name": "./source",
+    "filenames": {
+        "r203ov.csv": "r203ovwav.csv",
+        "r204ov.csv": "r204ovwav.csv",
+        "r205ov.csv": "r205ovwav.csv"
+    }
+}
