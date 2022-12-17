@@ -1,7 +1,7 @@
 from Utils.utility import *
 
 
-class Simp:
+class Sipm:
 
     def __init__(self, filename_wave: str = "Waveform.csv", filename_time: str = "Timestamp.csv") -> None:
         """
@@ -33,9 +33,28 @@ class Simp:
         # Crea un DataFrame (vuoto) per poi salvare i picchi trovati
         self.wave_front_peaks = pd.DataFrame()
 
-    def analyze_ev_wf(self, event, n_bsl, pic_name=None, plot=False, peak_height=0.001, peak_prominences=0.0001,
-                      compact=False):
-
+    def analyze_ev_wf(self, event: int, n_bsl: int, pic_name: str = None, plot: bool = False, peak_height: float = 0.001,
+                      peak_prominences: float = 0.0001,
+                      compact: bool = False) -> pd.DataFrame:
+        """
+        Funzione che analizza i waveform in base all'evento che riceve in input
+        :param event: indice dell'evento da analizzare
+        :type event: int
+        :param n_bsl: numero di punti della baseline da considerare per le analisi, questo parametro puo' essere modificato nel file do configurazione.
+        :type n_bsl: int
+        :param pic_name: Nome del file da cui il dato deriva da usare eventualmente come parte del titolo per salvare il relativo grafico. (Default: None)
+        :type pic_name: str
+        :param peak_height: Valore minimo del picco da trovare nella analisi dei picchi. Vedi: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html (Default: 0.001)
+        :type peak_height: float
+        :param peak_prominences: Valore minimo del rislato del picco da trovare nella analisi dei picchi. Vedi: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html (Default: 0.0001)
+        :type peak_prominences: float
+        :param compact: Parametro per decidere se visualizzare i grafici singolarmente (False) oppure in gruppi di 9 (True). (Default: False)
+        :type compact: bool
+        :param plot: Parametro per decidere se generarei vari plot oppure eseguire sono l'analisi senza visualizzazione. Questo parametro ha priorita' sul parametro 'compact'. (Default: False)
+        :type plot: bool
+        :return: La funzione restituisce i valori di tempo e ampiezza  rispetto agli indici dei massimi trovati dal metodo find_peaks di scipy.signal
+        :rtype: pd.DataFrame
+        """
         loop_max = 9 if compact else 1
         peaks_temp = pd.DataFrame()
         if compact:

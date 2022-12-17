@@ -44,15 +44,16 @@ class Config:
         print(f"Total runtime of the program is {self.end_time - self.start_time}")
 
 
-def read_table_from_file(filename: str, keyword: str) -> object:
+def read_table_from_file(filename: str, keyword: str) -> pd.DataFrame:
     """
-    Funzione
-    :param filename:
-    :type filename:
-    :param keyword:
-    :type keyword:
-    :return:
-    :rtype:
+    Funzione che trasforma un file csv in un DataFrame di pands
+    :param filename: path del file da convertire
+    :type filename:str
+    :param keyword: keyword da cercare per discriminare da quale riga del file iniziale a leggere per convertire solo le
+     informazioni utili
+    :type keyword: str
+    :return: Dataframe contenenti i dati letti dal csv
+    :rtype: pd.DataFrame
     """
     if not os.path.exists(filename):
         raise FileNotFoundError("File " + filename + "not found")
@@ -80,7 +81,14 @@ def read_table_from_file(filename: str, keyword: str) -> object:
     sys.exit(1)
 
 
-def numberfromstring(string_a):
+def numberfromstring(string_a: str) -> int:
+    """
+    Funzione che tasforma un numero letto come stringa  a intero
+    :param string_a: numero in input
+    :type string_a: str
+    :return: numero in output
+    :rtype: int
+    """
     n = list(string_a)
     number = ''
     for i in n:
@@ -89,24 +97,24 @@ def numberfromstring(string_a):
     return int(number)
 
 
-def peak_plot(event: object, wf_time: object, wf_ch: object, bsl_time: object, bsl_ch: object, peaks: object,
-              pic_name: object = "Default") -> object:
+def peak_plot(event: int, wf_time:float, wf_ch: int, bsl_time: float, bsl_ch: int, peaks: float,
+              pic_name: str = "Default") -> None:
     """
-
-    :param event:
-    :type event:
-    :param wf_time:
-    :type wf_time:
-    :param wf_ch:
-    :type wf_ch:
-    :param bsl_time:
-    :type bsl_time:
-    :param bsl_ch:
-    :type bsl_ch:
-    :param peaks:
-    :type peaks:
-    :param pic_name:
-    :type pic_name:
+    Funzione che genera i grafici dei vari picchi trovati per l'evento dato in input
+    :param event: event index
+    :type event: int
+    :param wf_time: Array dei timestamps
+    :type wf_time:float
+    :param wf_ch: canale dei chip dai quali il wavefront è letto
+    :type wf_ch: float
+    :param bsl_time: array dei tempi di lettura associati ai vari punti del wavefront
+    :type bsl_time: float
+    :param bsl_ch: canale del chip dalla quale è letta la baseline
+    :type bsl_ch: float
+    :param peaks: picchi calcolati con la funzione di scipy.signal find_peaks
+    :type peaks: float
+    :param pic_name: nome del file di provenienza con cui salvare il grafico
+    :type pic_name: str
     """
     # Ora posso plottare tutto:
     fig, ax = plt.subplots()
@@ -167,3 +175,19 @@ def plot_graphs_DCR_CTR_APR(group_name: str = 'DCR_GRAPH') -> None:
     ax.set_ylabel('(Hz)')
     fig.savefig(plot_name)
     plt.close(fig)
+
+def find_files():
+    """
+    Questa funzione esegue il file bash 'analisi_file.sh' che attraverso una find cerca tutti i file nelle da
+    caricare eseguendo una ricerca ricorsiva nelle cartelle e sotto cartelle del file path specificato        """
+    print("_____________________________")
+    dirname = os.getcwd()
+    print(dirname)
+
+    try:
+
+        subprocess.call("./Utils/analisi_file.sh")
+    except Exception as e:
+        print(e)
+        print("An error occurred trying to generate path_file.\n" +
+              "Please check if you have permission to execute 'analisi_file.sh'.")

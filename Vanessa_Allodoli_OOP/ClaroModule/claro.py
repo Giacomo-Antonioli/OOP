@@ -4,39 +4,36 @@ import numpy as np
 from Utils.utility import *
 
 
+
+
+
 class Claro:
 
     def __init__(self):
         self.linear_difference_list = []
         self.difference_error_list = []
 
-    def find_files(self):
-        """
-        Questa funzione esegue lo script 'analisi_file.sh', 
-        generando il file path_file con i path di tutti i file .txt 
-        che contengono i valori da analizzare.
-        """
-        print("_____________________________")
-        dirname = os.getcwd()
-        print(dirname)
-
-        try:
-
-            subprocess.call("./Utils/analisi_file.sh")
-        except Exception as e:
-            print(e)
-            print("An error occurred trying to generate path_file.\n" +
-                  "Please check if you have permission to execute 'analisi_file.sh'.")
-
     def linear_fit(self, number_of_files=20, number_of_chips=0, plot=True, inner_function=False, figure=None):
         """
+
         Funzione per il fit lineare.
         Parametri:
         - number_of_files: default 20, indica quanti file analizzare.
         - number_of_chips: default 0, indica quanti chip analizzare.
         Se 'number_of_chips' è 0, viene ignorato.
-        Se 'number_of_chips' è diverso da 0, vengono analizzati 'number_of_files' file e 
+        Se 'number_of_chips' è diverso da 0, vengono analizzati 'number_of_files' file e
         vengono considerati solo quelli con un numero di chip minore o uguale a 'number_of_chips'.
+
+        :param number_of_files: numero di file da analizzare. (Default: 20)
+        :type number_of_files: int
+        :param number_of_chips: numero di chip da analizzare. (Default: 20)
+        :type number_of_chips: int
+        :param plot: parametro per specificare se si vogliono generare i grafici o meno. (Default:True)
+        :type plot: Bool
+        :param inner_function: parametro per indicare se la funzione vine usata internamente nella funzione fit o meno. (Default: False)
+        :type inner_function: Bool
+        :param figure: figura nella quale generare eventualmente i grafici se 'inner_function' è True (Default: None)
+        :type figure: object
         """
         results = None
         if inner_function == True:
@@ -55,6 +52,7 @@ class Claro:
 
                 # In caso nel file ci siano valori non corretti, salta il ciclo
                 if x == 0 and y == 0 and true_threshold == 0 and chip_id == 0:
+                    bar.lenght=bar.lenght-1
                     continue
                 self.linear_fit_function(x, y, true_threshold=true_threshold, chip_id=chip_id,
                                          channel_number=channel_number, plot=plot, i=i, inner_function=inner_function,
@@ -66,27 +64,27 @@ class Claro:
     def linear_fit_function(self, x, y, true_threshold=0, chip_id=0, channel_number=0, plot=True, i=0,
                             inner_function=False, results=None, figure=None):
         """
-
-        @param x:
-        @type x:
-        @param y:
-        @type y:
-        @param true_threshold:
-        @type true_threshold:
-        @param chip_id:
-        @type chip_id:
-        @param channel_number:
-        @type channel_number:
-        @param plot:
-        @type plot:
-        @param i:
-        @type i:
-        @param inner_function:
-        @type inner_function:
-        @param results:
-        @type results:
-        @param figure:
-        @type figure:
+        Funzione base che computa e grafica il fit lineare di una delle letture relative ad un file.
+        @param x: Array di punti.
+        @type x: float
+        @param y: Array di punti.
+        @type y: float
+        @param true_threshold: Threshold del chip usato come base per confronto. (Default: 0)
+        @type true_threshold:float
+        @param chip_id: Id del chip relativo alla lettura. (Default: 0)
+        @type chip_id: int
+        @param channel_number: Canale del chip dalla quale i dati sono prelevati. (Default: 0)
+        @type channel_number: int
+        @param plot: Parametro per decidere se generare i grafici o meno i risultati. (Default: True)
+        @type plot: Bool
+        @param i: Indice del titolo del grafico relativo alla lettura corrente. (Default: 0)
+        @type i: int
+        :param inner_function: parametro per indicare se la funzione vine usata internamente nella funzione fit o meno. (Default: False)
+        :type inner_function: Bool
+        @param results: Riferimento al file in cui scrivere il risultato del fit lineare. (Default: None)
+        @type results: file
+        :param figure: figura nella quale generare eventualmente i grafici se 'inner_function' è True (Default: None)
+        :type figure: object
         """
         y_linearFit = np.array(y)
         y_linearFit = y_linearFit[y_linearFit > int(1 if (len(y_linearFit) == 1) else 5)]
@@ -134,7 +132,7 @@ class Claro:
                 "Chip: " + str(chip_id) + "\tCh: " + str(channel_number) + "\tReal Thres: " + str(true_threshold) +
                 "\tThresh Found:" + str(x_threshold) + "\tDiff: " + str(abs(x_threshold - true_threshold)) + "\n")
 
-    def fit(self, number_of_files=20, number_of_chips=0):
+    def fit(self, number_of_files=20, number_of_chips=0, plot=True):
         """
         Funzione per il fit dei dati. Unisce le funzioni 'fit_lineare' 
         e 'err_fit' disegnando una sola figure_number con entrambe le curve 
@@ -152,93 +150,20 @@ class Claro:
 
                 if x == 0 and y == 0 and true_threshold == 0 and chip_id == 0:
                     continue
-                f = plt.figure()
+                f = None
+                if plot:
+                    f = plt.figure()
+
                 self.error_fitting_function(x, y, true_threshold=true_threshold, chip_id=chip_id,
                                             figure_number=figure_number, last_chip=last_chip, inner_function=True,
                                             figure=f)
                 self.error_fitting_function(x, y, true_threshold=true_threshold, chip_id=chip_id,
                                             channel_number=channel_number, figure_number=figure_number,
                                             last_chip=last_chip, inner_function=True, figure=f)
-                plt.savefig("./claro/plot_test/fit_fig" + str(i) + "_chip_" + str(chip_id) + ".jpg")
-                plt.close()
+                if plot:
+                    plt.savefig("./claro/plot_test/fit_fig" + str(i) + "_chip_" + str(chip_id) + ".jpg")
+                    plt.close()
                 bar(1)
-            # plt.scatter(x, y, marker='o')
-            # plt.grid()
-            # plt.xscale('linear')
-            # plt.yscale('linear')
-
-            # # Fit lineare
-            # y_linearFit = np.array(y)
-            # y_linearFit = y_linearFit[y_linearFit > 5]
-            # y_linearFit = y_linearFit[y_linearFit < 990]
-
-            # # Se c'è un solo punto, l'intervallo è espanso sperando di trovarne almeno un altro
-            # if (len(y_linearFit) == 1):
-            #     y_linearFit = np.array(y)
-            #     y_linearFit = y_linearFit[y_linearFit > 1]
-            #     y_linearFit = y_linearFit[y_linearFit < 999]
-
-            # mask_array = np.in1d(y, y_linearFit)
-            # # True solo i valori scelti per il fit
-            # mask_array = np.invert(mask_array)
-            # # Usando una maschera ricavo i valori x utili
-            # x_linearFit = ma.masked_array(x, mask=mask_array).compressed()
-
-            # linearCoefficient = np.polyfit(x_linearFit, y_linearFit, 1)
-            # x_linearPlot = x_linearFit
-            # # Aggiunti due punti in più per allungare la retta
-            # x_linearPlot = np.insert(x_linearPlot, 0, x_linearFit[0]-2)
-            # x_linearPlot = np.append(x_linearPlot, x_linearFit[-1]+2)
-            # x_linearPlot = x_linearPlot*linearCoefficient[0] + linearCoefficient[1]
-
-            # x_linearThreshold = (500 - linearCoefficient[1]) / linearCoefficient[0]
-
-            # plt.text(x[0], 900, "Soglia calcolata (lin): x="+str(round(x_linearThreshold, 2))+"V\nSoglia vera: x=" +
-            #          str(round(true_threshold, 2))+"V\nDifferenza: "+str(round(true_threshold-x_linearThreshold, 2))+"V", fontsize=8)
-
-            # self.linear_difference_list.append((true_threshold-x_linearThreshold)**2)
-
-            # plt.plot(x_linearPlot, x_linearPlot,linestyle="--")
-
-            # Fit err function
-            # x = np.array(x)
-            # x_norm = [float(i) for i in x]  # Cast a float
-            # x_norm -= np.mean(x_norm)
-
-            # x_ERFplot = np.linspace(x_norm[0], x_norm[-1], len(x_norm)*100)
-            # y_ERFplot = (special.erf(x_ERFplot)+1) * \
-            #     500  # Adattamento verticale
-            # x_ERFplot += x[0]  # Adattamento orizzontale
-
-            # y_Junk = np.array(y)
-            # y_Junk = y_Junk[y_Junk < 50]
-            # index = len(y_Junk)  # Indice del primo elemento utile
-
-            # # Indice dell'elemento della funzione con stessa y
-            # extraFunctionIndex = np.argmin(abs(y_ERFplot - y[index]))
-            # extra = abs(x[index]-(x_ERFplot[extraFunctionIndex]))
-
-            # # Se ci sono due punti centrali, la curva è traslata in modo da essere
-            # # il più vicina possibile ad entrambi i punti
-            # if y[index+1] < 950:
-            #     extraFunctionIndex_2 = np.argmin(abs(y_ERFplot - y[index+1]))
-            #     extra2 = abs(x[index+1]-(x_ERFplot[extraFunctionIndex_2]))
-            #     # Secondo adattamento orizzontale
-            #     x_ERFplot += ((extra+extra2)/2)
-            # else:
-            #     x_ERFplot += extra  # Secondo adattamento orizzontale
-
-            # indexThreshold = np.argmin(abs(y_ERFplot-500))
-            # xERFthrehsold = x_ERFplot[indexThreshold]
-
-            # plt.scatter(x_ERFplot[indexThreshold],
-            #             y_ERFplot[indexThreshold], marker='o', color="black")
-
-            # plt.text(x[0], 500, "Soglia calcolata (erf): x="+str(round(xERFthrehsold, 2))+"V\nSoglia vera: x=" +
-            #          str(round(true_threshold, 2))+"V\nDifferenza: "+str(round(true_threshold-xERFthrehsold, 2))+"V", fontsize=8)
-
-            # self.difference_error_list.append((true_threshold-xERFthrehsold)**2)
-            # plt.plot(x_ERFplot, y_ERFplot)
 
     def err_fit_for_chips(self, number_of_files=200, minumum_number_of_chips_per_file=27, inner_function=False,
                           figure=None):

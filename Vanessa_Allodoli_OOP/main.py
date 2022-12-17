@@ -3,15 +3,15 @@ import json
 import time
 
 from ClaroModule.claro import Claro
-from SimpModule.simp import Simp
+from SimpModule.sipm import Sipm
 from Utils.utility import *
 
 
 def main():
     mode = sys.argv[1]
 
-    if mode == "simp":
-        print("SIMP ANALYZER")
+    if mode == "sipm":
+        print("SiPM ANALYZER")
         with open("./include/config.json") as json_data_file:
             data = json.load(json_data_file)
 
@@ -27,7 +27,7 @@ def main():
 
             init1 = time.time()
             print("Initializing Simp Module for file: " + config.filenames[key])
-            wave_front_simp = Simp(filename_wave, filename_time)
+            wave_front_simp = Sipm(filename_wave, filename_time)
             init2 = time.time()
             config.init_time += init2 - init1
 
@@ -73,10 +73,10 @@ def main():
         chip = 50
 
         claro = Claro()
-        claro.find_files()
+        find_files()
         print("Starting Fitting...")
         t1 = time.time()
-        claro.fit(elementi, chip)
+        claro.fit(elementi, chip,plot=False)
         t2 = time.time()
 
         print("Tempo fit per " + str(elementi) +
